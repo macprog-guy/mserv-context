@@ -1,5 +1,5 @@
 # Introduction
-mserv-context is a middleware that an empty `ctx` property to the message handling context. It can then be populated with arbitrary data on a per-request basis.
+mserv-context is [mserv](https://github.com/macprog-guy/mserv) middleware that an empty `ctx` property to the message handling context. It can then be populated with arbitrary data on a per-request basis.
 
 # Installation
 
