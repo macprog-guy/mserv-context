@@ -2,29 +2,41 @@
 
 module.exports = function(service, options) {
 
-	let handler = options && options.handler
+	let extname  = options.extension || 'context',
+		handlers = []
+
+	if (options && options.handler && typeof options.handler === 'function')
+		handlers.push(options.handler)
+
+	service.extend(extname, function(service, options){
+		return function(genFunc) {
+			handlers.push(genFunc)
+		}
+	})
+
 
 	return function*(next, options) {
 
 		// Make sure we have a context before yielding downstream
 		this.ctx = this.ctx || {}
 
-		// Call the global handler and let it add stuff to ctx
-		if (handler) {
+		// The handler list is handlers + action
+		let handlerList   = handlers,
+			actionHandler = options
+
+		if (options && typeof options !== 'function')
+			actionHandler = options.handler
+
+		if (actionHandler && typeof actionHandler === 'function')
+			handlerList = handlerList.concat([actionHandler])
+
+		// Call the all handlers and let them add stuff to ctx
+		for (let i in handlerList) {
+			let handler = handlerList[i]
 			if (isGeneratorFunction(handler))
 				yield* handler.call(this)
 			else
 				handler.call(this)
-		}
-
-		// Call the action level handler and let it add stuff to ctx
-		let action = options.handler || options
-
-		if (action && typeof action === 'function') {
-			if (isGeneratorFunction(handler))
-				yield* action.call(this)
-			else
-				action.call(this)
 		}
 		
 		// Yield to downstream middleware

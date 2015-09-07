@@ -12,13 +12,23 @@ service.use('context', context, {
 
 service.action({
 	name: 'check',
-	context: function() {
-		this.ctx.bar = 456
+	foo: {
+		bar:3
+	},
+	context: {
+		handler: function() {
+			this.ctx.bar = 456
+		}
 	},
 	handler: function*() {
 		array.push(this.ctx.foo)
 		array.push(this.ctx.bar)
+		array.push(this.ctx.baz)
 	}
+})
+
+service.ext.context(function*(){
+	this.ctx.baz = 789
 })
 
 
@@ -29,11 +39,11 @@ describe('mserv-context', function(){
 		done()
 	})
 
-	it('context should contain a foo value', function(done){
+	it('array should contain a three values', function(done){
 		service.script(function*(){
 			try {
 				yield this.invoke('check')
-				array.should.eql([123,456])
+				array.should.eql([123,456,789])
 				done()
 			}
 			catch(err) {
