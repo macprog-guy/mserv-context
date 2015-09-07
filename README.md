@@ -23,6 +23,20 @@ service.use('context', context, {
 
 ```
 
+# Global Context Handlers
+
+With version `0.2.1`, it became possible to register additional global context handlers.
+This can be useful if you want you own middleware to add global context or just to keep
+code where it belongs as opposed to some large setup function.
+
+```js
+
+service.ext.context(function*(){
+	this.ctx.foo = 789
+})
+```
+
+
 # Action Specific Context
 
 Actions can have their own context handlers that get executed after the global handler.
